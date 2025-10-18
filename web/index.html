@@ -1,15 +1,61 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - CÔNG TY X</title>
+    <link rel="icon" type="image/png" href="/web/public/assets/logo-embedded-chat-header@3x.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gray-100 flex items-center justify-center min-h-screen flex-col gap-6"
+  >
+    <img src="/web/public/assets/logo-site.png" alt="" />
+    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
+      <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">
+        Đăng nhập
+      </h2>
+
+      <form>
+        <div class="mb-4">
+          <input
+            name="username"
+            type="text"
+            placeholder="Nhập tài khoản..."
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        <div class="mb-6">
+          <input
+            name="password"
+            type="password"
+            placeholder="Nhập mật khẩu..."
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Đăng nhập
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-gray-500 mb-3">Hoặc</p>
+        <button
+          class="w-full flex items-center justify-center gap-2 border py-2 rounded-lg hover:bg-gray-50 transition"
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+            class="w-5 h-5"
+          />
+          <span>Đăng nhập bằng Google</span>
+        </button>
+      </div>
+    </div>
+  </body>
 </html>
