@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Role;
+import java.util.List;
 
 public class RoleDBContext extends DBContext<Role> {
 
@@ -90,6 +91,24 @@ public class RoleDBContext extends DBContext<Role> {
         } catch (SQLException ex) {
             Logger.getLogger(RoleDBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public List<Role> GetListRole() {
+        List<Role> roles = new ArrayList<>();
+        String sql = "SELECT ID, name FROM Role";
+        try (PreparedStatement stm = connection.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            while (rs.next()) {
+                Role r = new Role();
+                r.setId(rs.getLong("ID"));
+                r.setName(rs.getString("name"));
+                roles.add(r);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roles;
     }
 }
 

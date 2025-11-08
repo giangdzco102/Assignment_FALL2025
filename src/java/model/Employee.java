@@ -1,11 +1,15 @@
 package model;
 
+import java.util.ArrayList;
+
 public class Employee extends BaseModel {
+
     private String name;
     private String username;
     private String password;
     private Employee manager; // ID_manager
     private Division division; // ID_division
+    private ArrayList<Role> roles;
 
     public String getName() {
         return name;
@@ -45,5 +49,13 @@ public class Employee extends BaseModel {
 
     public void setDivision(Division division) {
         this.division = division;
+    }
+
+    public ArrayList<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(ArrayList<Role> roles) {
+        this.roles = roles;
     }
 }

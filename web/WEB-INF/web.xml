@@ -1,21 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-    <context-param>
-        <param-name>username</param-name>
-        <param-value>admin</param-value>
-    </context-param>
     <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.auth.LoginController</servlet-class>
-        <init-param>
-            <param-name>password</param-name>
-            <param-value>123</param-value>
-        </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>LogoutController</servlet-name>
+        <servlet-class>controller.auth.LogoutController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutController</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    
+    
+    
+    
+    <servlet>
+        <servlet-name>HomeController</servlet-name>
+        <servlet-class>controller.feature.HomeController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeController</servlet-name>
+        <url-pattern>/feature/home</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AgendaController</servlet-name>
+        <servlet-class>controller.feature.AgendaController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AgendaController</servlet-name>
+        <url-pattern>/feature/agenda</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>RequestForLeaveController</servlet-name>
+        <servlet-class>controller.feature.RequestForLeaveController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RequestForLeaveController</servlet-name>
+        <url-pattern>/feature/requestforleave</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>CreateAccountController</servlet-name>
+        <servlet-class>controller.feature.CreateAccountController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateAccountController</servlet-name>
+        <url-pattern>/feature/createaccount</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ListAccountController</servlet-name>
+        <servlet-class>controller.feature.ListAccountController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ListAccountController</servlet-name>
+        <url-pattern>/feature/listaccount</url-pattern>
+    </servlet-mapping>
+    
+    
+    
+    <filter>
+        <filter-name>FeatureAuthorizationFilter</filter-name>
+        <filter-class>controller.filter.FeatureAuthorizationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>FeatureAuthorizationFilter</filter-name>
+        <url-pattern>/feature/*</url-pattern>
+    </filter-mapping>
     <session-config>
         <session-timeout>20</session-timeout>
     </session-config>

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.Employee;
+import java.util.List;
 
 public class LoginController extends HttpServlet {
 
@@ -21,7 +22,7 @@ public class LoginController extends HttpServlet {
         // Kiểm tra rỗng
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             req.setAttribute("message", "Vui lòng nhập đầy đủ tài khoản và mật khẩu!");
-            req.getRequestDispatcher("view/auth/login.jsp").forward(req, resp);
+            req.getRequestDispatcher("/auth/login.jsp").forward(req, resp);
             return;
         }
 
@@ -29,10 +30,20 @@ public class LoginController extends HttpServlet {
         Employee employee = db.get(username, password);
 
         if (employee != null) {
-            // Đăng nhập thành công
             HttpSession session = req.getSession();
             session.setAttribute("auth", employee);
-            resp.sendRedirect(req.getContextPath() + "/home");
+
+            // Lấy role và feature của employee
+            List<String> urls = db.getFeatureURLsByEmployee(employee.getId());
+            session.setAttribute("featureURLs", urls);
+            
+            boolean isAdmin = db.isAdmin(employee.getId());
+            
+            if (isAdmin) {
+                resp.sendRedirect(req.getContextPath() + "/feature/listaccount");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/feature/home");
+            }
         } else {
             // Sai mật khẩu hoặc tài khoản không tồn tại
             req.setAttribute("message", "Sai tài khoản hoặc mật khẩu!");
@@ -45,4 +56,5 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
         req.getRequestDispatcher("auth/login.jsp").forward(req, resp);
     }
+
 }

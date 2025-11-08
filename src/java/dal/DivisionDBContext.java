@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Division;
 import model.Employee;
+import java.util.List;
 
 public class DivisionDBContext extends DBContext<Division> {
 
@@ -101,5 +102,23 @@ public class DivisionDBContext extends DBContext<Division> {
         } catch (SQLException ex) {
             Logger.getLogger(DivisionDBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public List<Division> GetListDivisions() {
+        List<Division> list = new ArrayList<>();
+        try {
+            String sql = "SELECT ID, Name FROM Division";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Division d = new Division();
+                d.setId(rs.getLong("ID"));
+                d.setName(rs.getString("Name"));
+                list.add(d);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return list;
     }
 }
