@@ -6,6 +6,7 @@
         <meta charset="UTF-8">
         <title>Home - Welcome</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body class="bg-gray-100 min-h-screen flex flex-col">
 
@@ -17,6 +18,11 @@
         <main class="flex-1 p-6">
             <div class="max-w-4xl mx-auto bg-white shadow rounded p-6">
                 <h2 class="text-2xl font-bold mb-4">Thông tin cá nhân</h2>
+                <div class="flex justify-start mb-6">
+                    <img src="${pageContext.request.contextPath}/public/assets/avar.jpg" 
+                         alt="Avatar" 
+                         class="w-24 h-24 rounded-full object-cover border-2 border-gray-300">
+                </div>
                 <%
     Employee account = (Employee) request.getAttribute("account");
     String roleName = (String) request.getAttribute("roleName");
