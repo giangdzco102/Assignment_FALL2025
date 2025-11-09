@@ -329,5 +329,59 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         }
         return leave;
     }
+    
+    public List<LeaveApplication> getLeavesApproveForManager(long managerId) {
+        List<LeaveApplication> leaves = new ArrayList<>();
+        String sql = "SELECT la.*, e.Name AS empName, p.Name AS processorName "
+                + "FROM LeaveApplication la "
+                + "JOIN Employee e ON la.created_by = e.ID "
+                + "LEFT JOIN Employee p ON la.processed_by = p.ID "
+                + "WHERE e.ID_manager = ? AND la.status = 'APPROVED'";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setLong(1, managerId);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    LeaveApplication leave = new LeaveApplication();
+                    leave.setId(rs.getLong("ID"));
+
+                    Employee creator = new Employee();
+                    creator.setId(rs.getLong("created_by"));
+                    creator.setName(rs.getString("empName"));
+                    leave.setCreatedBy(creator);
+
+                    Timestamp tCreate = rs.getTimestamp("create_time");
+                    if (tCreate != null) {
+                        leave.setCreateTime(new Date(tCreate.getTime()));
+                    }
+
+                    Timestamp tFrom = rs.getTimestamp("from");
+                    if (tFrom != null) {
+                        leave.setFrom(new Date(tFrom.getTime()));
+                    }
+
+                    Timestamp tTo = rs.getTimestamp("to");
+                    if (tTo != null) {
+                        leave.setTo(new Date(tTo.getTime()));
+                    }
+
+                    leave.setReason(rs.getString("reason"));
+                    leave.setStatus(rs.getString("status"));
+
+                    long processedById = rs.getLong("processed_by");
+                    if (!rs.wasNull()) {
+                        Employee processor = new Employee();
+                        processor.setId(processedById);
+                        processor.setName(rs.getString("processorName"));
+                        leave.setProcessedBy(processor);
+                    }
+
+                    leaves.add(leave);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return leaves;
+    }
 
 }

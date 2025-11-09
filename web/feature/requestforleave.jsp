@@ -16,14 +16,14 @@
 
         <h2 class="text-2xl font-bold mb-4">Nộp đơn xin nghỉ</h2>
 
-        <form action="${pageContext.request.contextPath}/feature/requestforleave" method="post" class="space-y-4">
+        <form id="leaveForm" action="${pageContext.request.contextPath}/feature/requestforleave" method="post" class="space-y-4">
             <div>
                 <label>Từ ngày:</label>
-                <input type="date" name="from" required class="border rounded p-2" />
+                <input type="date" id="fromDate" name="from" required class="border rounded p-2" />
             </div>
             <div>
                 <label>Đến ngày:</label>
-                <input type="date" name="to" required class="border rounded p-2" />
+                <input type="date" id="toDate" name="to" required class="border rounded p-2" />
             </div>
             <div>
                 <label>Lý do:</label><br/>
@@ -31,6 +31,28 @@
             </div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Nộp đơn</button>
         </form>
+
+        <script>
+            const form = document.getElementById('leaveForm');
+            form.addEventListener('submit', function (event) {
+                const from = document.getElementById('fromDate').value;
+                const to = document.getElementById('toDate').value;
+                const today = new Date().toISOString().split('T')[0];
+
+                if (from < today || to < today) {
+                    alert("Không thể sửa chữa lỗi lầm trong quá khứ!");
+                    event.preventDefault();
+                    return;
+                }
+
+                if (from > to) {
+                    alert("Không thể ngược lại được sao!");
+                    event.preventDefault();
+                    return;
+                }
+            });
+        </script>
+
 
         <jsp:include page="../component/footer.jsp" />
     </body>

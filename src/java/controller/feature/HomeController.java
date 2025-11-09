@@ -1,21 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.feature;
 
-/**
- *
- * @author ASUS
- */
-
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import model.Employee;
+import dal.EmployeeRoleDBContext;
+import dal.EmployeeDBContext;
 
 public class HomeController extends HttpServlet {
 
@@ -24,15 +14,27 @@ public class HomeController extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = req.getSession();
-        Employee employee = (Employee) session.getAttribute("auth");
-
-        if (employee == null) {
-            // Nếu chưa login, chuyển về trang login
+        Employee account = (Employee) session.getAttribute("auth");
+        if (account == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
-        // Forward tới home.jsp
+        // Lấy role của nhân viên
+        EmployeeRoleDBContext erDB = new EmployeeRoleDBContext();
+        account.setRoles(erDB.getRolesByEmployeeId(account.getId()));
+        String roleName = account.getRoles().isEmpty() ? "Chưa có" : account.getRoles().get(0).getName();
+        
+        String divisionName = new EmployeeDBContext().getDivisionNameByEmployeeId(account.getId());
+
+
+
+        // Đặt dữ liệu vào request
+        req.setAttribute("account", account);
+        req.setAttribute("roleName", roleName);
+        req.setAttribute("divisionName", divisionName);
+
+
         req.getRequestDispatcher("/feature/home.jsp").forward(req, resp);
     }
 

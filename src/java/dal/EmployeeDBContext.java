@@ -351,4 +351,21 @@ public class EmployeeDBContext extends DBContext<Employee> {
         return false;
     }
 
+    public String getDivisionNameByEmployeeId(long empId) {
+        String sql = "SELECT d.name "
+                + "FROM Employee e "
+                + "LEFT JOIN Division d ON e.ID_division = d.ID "
+                + "WHERE e.ID = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setLong(1, empId);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("name");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Chưa có";
+    }
 }

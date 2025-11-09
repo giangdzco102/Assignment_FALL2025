@@ -8,7 +8,6 @@ package dal;
  *
  * @author ASUS
  */
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -110,4 +109,26 @@ public class EmployeeRoleDBContext extends DBContext<EmployeeRole> {
             Logger.getLogger(EmployeeRoleDBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public ArrayList<Role> getRolesByEmployeeId(long employeeId) {
+        ArrayList<Role> roles = new ArrayList<>();
+        try {
+            String sql = "SELECT r.* FROM Role r "
+                    + "JOIN EmployeeRole er ON r.ID = er.RoleID "
+                    + "WHERE er.EmployeeID = ?";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setLong(1, employeeId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                Role r = new Role();
+                r.setId(rs.getLong("ID"));
+                r.setName(rs.getString("name"));
+                roles.add(r);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roles;
+    }
+
 }

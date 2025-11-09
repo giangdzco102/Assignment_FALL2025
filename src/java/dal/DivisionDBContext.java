@@ -69,8 +69,11 @@ public class DivisionDBContext extends DBContext<Division> {
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, div.getName());
-            if (div.getHeadDivision() != null) stm.setLong(2, div.getHeadDivision().getId()); 
-            else stm.setNull(2, Types.BIGINT);
+            if (div.getHeadDivision() != null) {
+                stm.setLong(2, div.getHeadDivision().getId());
+            } else {
+                stm.setNull(2, Types.BIGINT);
+            }
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(DivisionDBContext.class.getName()).log(Level.SEVERE, null, ex);
@@ -83,8 +86,11 @@ public class DivisionDBContext extends DBContext<Division> {
         try {
             PreparedStatement stm = connection.prepareStatement(sql);
             stm.setString(1, div.getName());
-            if (div.getHeadDivision() != null) stm.setLong(2, div.getHeadDivision().getId()); 
-            else stm.setNull(2, Types.BIGINT);
+            if (div.getHeadDivision() != null) {
+                stm.setLong(2, div.getHeadDivision().getId());
+            } else {
+                stm.setNull(2, Types.BIGINT);
+            }
             stm.setLong(3, div.getId());
             stm.executeUpdate();
         } catch (SQLException ex) {
@@ -103,7 +109,7 @@ public class DivisionDBContext extends DBContext<Division> {
             Logger.getLogger(DivisionDBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public List<Division> GetListDivisions() {
         List<Division> list = new ArrayList<>();
         try {

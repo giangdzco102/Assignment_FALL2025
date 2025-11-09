@@ -2,6 +2,10 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/E:/FALL25/PRJ301/Assignment_FALL2025/src/java/controller/feature/AgendaController.java</file>
+            <file>file:/E:/FALL25/PRJ301/Assignment_FALL2025/web/feature/agenda.jsp</file>
+            <file>file:/E:/FALL25/PRJ301/Assignment_FALL2025/web/feature/review.jsp</file>
+        </group>
     </open-files>
 </project-private>
