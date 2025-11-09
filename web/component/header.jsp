@@ -21,8 +21,9 @@
                     switch(url) {
                         case "/feature/home": name = "Home"; break;
                         case "/feature/agenda": name = "Agenda"; break;
-                        case "/feature/requestforleave": name = "Request For Leave";
-                        case "/feature/review": name = "Review";
+                        case "/feature/requestforleave": name = ""; break;
+                        case "/feature/listleave": name = "List Application";break;
+                        case "/feature/review": name = "Review Application";break;
                         case "/feature/createaccount": name = "Create Account"; break;
                         case "/feature/listaccount": name = "List Account"; break;
 

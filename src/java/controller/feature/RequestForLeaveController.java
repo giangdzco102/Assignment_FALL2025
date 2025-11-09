@@ -1,22 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller.feature;
 
-/**
- *
- * @author ASUS
- */
-
+import dal.LeaveApplicationDBContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import model.Employee;
-import java.util.List;
+import model.LeaveApplication;
 
 public class RequestForLeaveController extends HttpServlet {
 
@@ -38,7 +29,45 @@ public class RequestForLeaveController extends HttpServlet {
             return;
         }
 
-        req.getRequestDispatcher("/feature/requestforleave.jsp").forward(req, resp);
+        // Nếu là lần đầu mở trang (chưa có form)
+        if (req.getParameter("from") == null) {
+            req.getRequestDispatcher("/feature/requestforleave.jsp").forward(req, resp);
+            return;
+        }
+
+        try {
+            // Parse dữ liệu form
+            String fromStr = req.getParameter("from");
+            String toStr = req.getParameter("to");
+            String reason = req.getParameter("reason");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date from = sdf.parse(fromStr);
+            Date to = sdf.parse(toStr);
+
+            // Tạo đối tượng LeaveApplication
+            LeaveApplication leave = new LeaveApplication();
+            leave.setCreatedBy(employee);
+            leave.setCreateTime(new Date());
+            leave.setFrom(from);
+            leave.setTo(to);
+            leave.setReason(reason);
+            leave.setStatus("PENDING");
+            if (employee.getManager() != null) {
+                leave.setProcessedBy(employee.getManager());
+            }
+
+            // Lưu vào DB
+            LeaveApplicationDBContext db = new LeaveApplicationDBContext();
+            db.insert(leave);
+
+            // Sau khi nộp thành công → chuyển hướng về danh sách đơn nghỉ
+            resp.sendRedirect(req.getContextPath() + "/feature/listleave");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(500, "Lỗi khi nộp đơn nghỉ");
+        }
     }
 
     @Override
