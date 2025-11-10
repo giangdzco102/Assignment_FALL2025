@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.Employee;
 import model.Division;
+import model.Employee;
 
 public class EmployeeDBContext extends DBContext<Employee> {
 
-    // ===== LIST ==========================================================
     @Override
     public ArrayList<Employee> list() {
         ArrayList<Employee> list = new ArrayList<>();
@@ -83,7 +82,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
                     emp.setUsername(rs.getString("username"));
                     emp.setPassword(rs.getString("password"));
 
-                    // Division
                     long divId = rs.getLong("div_id");
                     if (!rs.wasNull()) {
                         Division div = new Division();
@@ -92,7 +90,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
                         emp.setDivision(div);
                     }
 
-                    // Manager
                     long managerId = rs.getLong("manager_id");
                     if (!rs.wasNull()) {
                         Employee manager = new Employee();
@@ -105,7 +102,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
                     empMap.put(empId, emp);
                 }
 
-                // Role (có thể nhiều)
                 long roleId = rs.getLong("role_id");
                 if (!rs.wasNull()) {
                     model.Role role = new model.Role();
@@ -122,7 +118,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         return list;
     }
 
-    // ===== GET BY ID =====================================================
     @Override
     public Employee get(int id) {
         return get((long) id);
@@ -168,7 +163,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         return e;
     }
 
-    // ===== GET BY USERNAME + PASSWORD ===================================
     public Employee get(String username, String password) {
         Employee e = null;
         String sql = "SELECT ID, name, username, password, ID_manager, ID_division "
@@ -204,7 +198,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         return e;
     }
 
-    // ===== INSERT ========================================================
     @Override
     public void insert(Employee e) {
         String sql = "INSERT INTO Employee (name, username, password, ID_manager, ID_division) "
@@ -228,7 +221,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
 
             stm.executeUpdate();
 
-            // Lấy ID tự sinh
             ResultSet rs = stm.getGeneratedKeys();
             if (rs.next()) {
                 e.setId(rs.getLong(1));
@@ -238,7 +230,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         }
     }
 
-    // ===== UPDATE ========================================================
     @Override
     public void update(Employee e) {
         String sql = "UPDATE Employee SET name = ?, username = ?, password = ?, "
@@ -267,7 +258,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         }
     }
 
-    // ===== DELETE ========================================================
     @Override
     public void delete(Employee e) {
         String sqlDeleteRoles = "DELETE FROM EmployeeRole WHERE EmployeeID = ?";
@@ -277,31 +267,26 @@ public class EmployeeDBContext extends DBContext<Employee> {
         String sql = "DELETE FROM Employee WHERE ID = ?";
 
         try {
-            connection.setAutoCommit(false); // 👈 bắt đầu transaction
+            connection.setAutoCommit(false);  
 
             try (PreparedStatement stm1 = connection.prepareStatement(sqlDeleteRoles); PreparedStatement stm2 = connection.prepareStatement(sqlDeleteLeavesCreated); PreparedStatement stm3 = connection.prepareStatement(sqlDeleteLeavesProcessed); PreparedStatement stm4 = connection.prepareStatement(sqlUnsetDivisionHead); PreparedStatement stm5 = connection.prepareStatement(sql)) {
 
-                // 1. Xóa EmployeeRole
                 stm1.setLong(1, e.getId());
                 stm1.executeUpdate();
 
-                // 2. Xóa đơn nghỉ phép do nhân viên tạo
                 stm2.setLong(1, e.getId());
                 stm2.executeUpdate();
 
-                // 3. Gỡ các LeaveApplication mà nhân viên từng xử lý
                 stm3.setLong(1, e.getId());
                 stm3.executeUpdate();
 
-                // 4. Gỡ khỏi head_division nếu có
                 stm4.setLong(1, e.getId());
                 stm4.executeUpdate();
 
-                // 5. Cuối cùng mới xóa Employee
                 stm5.setLong(1, e.getId());
                 stm5.executeUpdate();
 
-                connection.commit(); // 👈 xác nhận transaction
+                connection.commit(); 
             } catch (SQLException ex) {
                 connection.rollback();
                 Logger.getLogger(EmployeeDBContext.class.getName()).log(Level.SEVERE, null, ex);
@@ -314,7 +299,6 @@ public class EmployeeDBContext extends DBContext<Employee> {
         }
     }
 
-    // ===== GET FEATURE URLS =============================================
     public List<String> getFeatureURLsByEmployee(long employeeId) {
         List<String> urls = new ArrayList<>();
         String sql = "SELECT f.URL "
@@ -334,11 +318,10 @@ public class EmployeeDBContext extends DBContext<Employee> {
         return urls;
     }
 
-    // ===== CHECK ADMIN ===================================================
     public boolean isAdmin(long employeeId) {
         String sql = "SELECT COUNT(*) FROM EmployeeRole er "
                 + "JOIN Role r ON er.RoleID = r.ID "
-                + "WHERE er.EmployeeID = ? AND LOWER(r.name) = 'admin'";
+                + "WHERE er.EmployeeID = ? AND LOWER(r.name) = 'Admin'";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setLong(1, employeeId);
             ResultSet rs = stm.executeQuery();

@@ -20,7 +20,6 @@ public class HomeController extends HttpServlet {
             return;
         }
 
-        // Lấy role của nhân viên
         EmployeeRoleDBContext erDB = new EmployeeRoleDBContext();
         account.setRoles(erDB.getRolesByEmployeeId(account.getId()));
         String roleName = account.getRoles().isEmpty() ? "Chưa có" : account.getRoles().get(0).getName();
@@ -29,7 +28,6 @@ public class HomeController extends HttpServlet {
 
 
 
-        // Đặt dữ liệu vào request
         req.setAttribute("account", account);
         req.setAttribute("roleName", roleName);
         req.setAttribute("divisionName", divisionName);

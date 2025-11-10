@@ -74,7 +74,7 @@
 
                                 if (!currentDay.before(start) && !currentDay.after(end)) {
                                     isLeave = true;
-                                    if (isManager && la.getCreatedBy() != null) {
+                                    if ( la.getCreatedBy() != null) {
                                         tooltip.append(la.getCreatedBy().getName()).append(", ");
                                     }
                                 }
@@ -88,7 +88,7 @@
                                         hover:bg-gray-200 transition">
                                 <%= day %>
                             </div>
-                            <% if (isLeave && isManager && !tooltipStr.isEmpty()) { %>
+                            <% if (isLeave && !tooltipStr.isEmpty()) { %>
                                 <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded mt-1 left-1/2 transform -translate-x-1/2 z-10 shadow-lg">
                                     <%= tooltipStr %>
                                 </div>

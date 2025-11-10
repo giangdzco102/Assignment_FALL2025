@@ -25,7 +25,6 @@ public abstract class BaseRequiredAuthenticationController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (isAuthenticated(req)) {
-           //exec , autheticate -->user
             Employee u = (Employee) req.getSession().getAttribute("auth");
             doPost(req, resp, u);
         } else {
@@ -36,7 +35,6 @@ public abstract class BaseRequiredAuthenticationController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (isAuthenticated(req)) {
-            //do business
              Employee u = (Employee) req.getSession().getAttribute("auth");
             doGet(req, resp, u);
         } else {

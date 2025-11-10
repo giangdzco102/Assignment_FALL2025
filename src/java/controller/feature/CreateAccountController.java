@@ -23,7 +23,6 @@ public class CreateAccountController extends HttpServlet {
         EmployeeDBContext empDB = new EmployeeDBContext();
         RoleDBContext roleDB = new RoleDBContext();
 
-        // Lấy danh sách Division, Manager và Role
         List<Division> divisions = divDB.GetListDivisions();
         List<Employee> managers = empDB.list();
         List<Role> roles = roleDB.list();
@@ -50,7 +49,6 @@ public class CreateAccountController extends HttpServlet {
             String divisionId = req.getParameter("ID_division");
             String roleId = req.getParameter("RoleID");
 
-            // --- Tạo Employee ---
             Employee emp = new Employee();
             emp.setName(name);
             emp.setUsername(username);
@@ -68,11 +66,9 @@ public class CreateAccountController extends HttpServlet {
                 emp.setDivision(div);
             }
 
-            // Insert employee
             EmployeeDBContext empDB = new EmployeeDBContext();
             empDB.insert(emp);
-
-            // --- Gán role ---
+            
             if (roleId != null && !roleId.isEmpty()) {
                 EmployeeRole er = new EmployeeRole();
                 er.setEmployee(emp);

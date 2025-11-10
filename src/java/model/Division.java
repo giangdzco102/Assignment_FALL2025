@@ -2,8 +2,7 @@ package model;
 
 public class Division extends BaseModel {
     private String name;
-    private Employee headDivision; // head_division_id
-
+    private Employee headDivision;
     public String getName() {
         return name;
     }

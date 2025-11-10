@@ -2,11 +2,11 @@ package dal;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.LeaveApplication;
 import model.Employee;
-import java.util.List;
+import model.LeaveApplication;
 
 public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
 
@@ -46,13 +46,11 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         return list;
     }
 
-    // override abstract method từ DBContext
     @Override
     public LeaveApplication get(int id) {
         return get((long) id);
     }
 
-    // method thực sự dùng long cho BIGINT
     public LeaveApplication get(long id) {
         LeaveApplication la = null;
         String sql = "SELECT ID, created_by, create_time, [from], [to], reason, status, processed_by FROM LeaveApplication WHERE ID = ?";
@@ -147,7 +145,6 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         }
     }
 
-    // Update status và processed_by
     public void updateStatus(LeaveApplication leave) {
         String sql = "UPDATE LeaveApplication SET status = ?, processed_by = ? WHERE ID = ?";
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
@@ -164,7 +161,6 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         }
     }
 
-    // Lấy danh sách đơn PENDING các nhân viên mà manager quản lý
     public List<LeaveApplication> getLeavesForManager(long managerId) {
         List<LeaveApplication> leaves = new ArrayList<>();
         String sql = "SELECT la.*, e.Name AS empName, p.Name AS processorName "
@@ -219,7 +215,6 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         return leaves;
     }
 
-// Lấy tất cả đơn của 1 nhân viên (cả PENDING/APPROVED/REJECTED/CANCELLED)
     public List<LeaveApplication> getLeavesByEmployee(long employeeId) {
         List<LeaveApplication> list = new ArrayList<>();
         String sql = "SELECT la.*, e.Name AS empName, p.Name AS processorName "
@@ -234,13 +229,11 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
                 while (rs.next()) {
                     LeaveApplication la = new LeaveApplication();
                     la.setId(rs.getLong("ID"));
-                    // createdBy
                     Employee creator = new Employee();
                     creator.setId(rs.getLong("created_by"));
                     creator.setName(rs.getString("empName"));
                     la.setCreatedBy(creator);
 
-                    // timestamps -> java.util.Date
                     Timestamp tCreate = rs.getTimestamp("create_time");
                     if (tCreate != null) {
                         la.setCreateTime(new Date(tCreate.getTime()));
@@ -288,7 +281,6 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
                     leave = new LeaveApplication();
                     leave.setId(rs.getLong("ID"));
 
-                    // Người tạo
                     Employee creator = new Employee();
                     creator.setId(rs.getLong("created_by"));
                     creator.setName(rs.getString("empName"));
@@ -296,11 +288,10 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
                     if (!rs.wasNull()) {
                         Employee manager = new Employee();
                         manager.setId(managerId);
-                        creator.setManager(manager); // set manager cho creator
+                        creator.setManager(manager); 
                     }
                     leave.setCreatedBy(creator);
 
-                    // Thời gian
                     leave.setCreateTime(rs.getTimestamp("create_time") != null
                             ? new Date(rs.getTimestamp("create_time").getTime())
                             : null);
@@ -313,8 +304,6 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
 
                     leave.setReason(rs.getString("reason"));
                     leave.setStatus(rs.getString("status"));
-
-                    // Người duyệt
                     long processedById = rs.getLong("processed_by");
                     if (!rs.wasNull()) {
                         Employee processor = new Employee();
@@ -329,7 +318,7 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
         }
         return leave;
     }
-    
+
     public List<LeaveApplication> getLeavesApproveForManager(long managerId) {
         List<LeaveApplication> leaves = new ArrayList<>();
         String sql = "SELECT la.*, e.Name AS empName, p.Name AS processorName "
@@ -382,6 +371,140 @@ public class LeaveApplicationDBContext extends DBContext<LeaveApplication> {
             e.printStackTrace();
         }
         return leaves;
+    }
+
+    public List<LeaveApplication> getLeavesForDivisionHead() {
+        List<LeaveApplication> list = new ArrayList<>();
+        try {
+            String sql = "SELECT la.*, e.ID as empID, e.Name as empName "
+                    + "FROM LeaveApplication la "
+                    + "JOIN Employee e ON la.created_by = e.ID "
+                    + "WHERE la.status = 'APPROVED'";
+            PreparedStatement stm = connection.prepareStatement(sql);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                LeaveApplication la = new LeaveApplication();
+                la.setId(rs.getLong("ID"));
+                la.setFrom(rs.getDate("from"));
+                la.setTo(rs.getDate("to"));
+                la.setReason(rs.getString("reason"));
+                la.setStatus(rs.getString("status"));
+
+                Employee emp = new Employee();
+                emp.setId(rs.getLong("empID"));
+                emp.setName(rs.getString("empName"));
+                la.setCreatedBy(emp);
+
+                list.add(la);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<LeaveApplication> getLeavesByManager(long managerId) {
+        List<LeaveApplication> list = new ArrayList<>();
+        try {
+            String sql = """
+            SELECT la.ID AS laID,
+                   la.[from] AS from_date,
+                   la.[to] AS to_date,
+                   la.reason,
+                   la.status,
+                   la.create_time,
+                   e.ID AS empID,
+                   e.Name AS empName,
+                   p.ID AS procID,
+                   p.Name AS procName
+            FROM LeaveApplication la
+            JOIN Employee e ON la.created_by = e.ID
+            LEFT JOIN Employee p ON la.processed_by = p.ID
+            WHERE e.ID_manager = ?
+            ORDER BY la.create_time DESC
+        """;
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setLong(1, managerId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                LeaveApplication la = new LeaveApplication();
+                la.setId(rs.getLong("laID"));
+                la.setFrom(rs.getTimestamp("from_date"));
+                la.setTo(rs.getTimestamp("to_date"));
+                la.setReason(rs.getString("reason"));
+                la.setStatus(rs.getString("status"));
+                Employee emp = new Employee();
+                emp.setId(rs.getLong("empID"));
+                emp.setName(rs.getString("empName"));
+                la.setCreatedBy(emp);
+                long procId = rs.getLong("procID");
+                if (!rs.wasNull()) {
+                    Employee proc = new Employee();
+                    proc.setId(procId);
+                    proc.setName(rs.getString("procName"));
+                    la.setProcessedBy(proc);
+                }
+                list.add(la);
+            }
+            rs.close();
+            stm.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<LeaveApplication> getLeavesForDivisionHead(long divisionHeadId) {
+        List<LeaveApplication> list = new ArrayList<>();
+        try {
+            String sql = """
+            SELECT la.ID AS laID,
+                   la.[from] AS from_date,
+                   la.[to] AS to_date,
+                   la.reason,
+                   la.status,
+                   la.create_time,
+                   e.ID AS empID,
+                   e.Name AS empName,
+                   p.ID AS procID,
+                   p.Name AS procName
+            FROM LeaveApplication la
+            JOIN Employee e ON la.created_by = e.ID
+            LEFT JOIN Employee p ON la.processed_by = p.ID
+            WHERE e.ID_division IN (
+                SELECT d.ID FROM Division d WHERE d.head_division_id = ?
+            )
+            ORDER BY la.create_time DESC
+        """;
+            PreparedStatement stm = connection.prepareStatement(sql);
+            stm.setLong(1, divisionHeadId);
+            ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                LeaveApplication la = new LeaveApplication();
+                la.setId(rs.getLong("laID"));
+                la.setFrom(rs.getTimestamp("from_date"));
+                la.setTo(rs.getTimestamp("to_date"));
+                la.setReason(rs.getString("reason"));
+                la.setStatus(rs.getString("status"));
+                Employee emp = new Employee();
+                emp.setId(rs.getLong("empID"));
+                emp.setName(rs.getString("empName"));
+                la.setCreatedBy(emp);
+                long procId = rs.getLong("procID");
+                if (!rs.wasNull()) {
+                    Employee proc = new Employee();
+                    proc.setId(procId);
+                    proc.setName(rs.getString("procName"));
+                    la.setProcessedBy(proc);
+                }
+                list.add(la);
+            }
+            rs.close();
+            stm.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }

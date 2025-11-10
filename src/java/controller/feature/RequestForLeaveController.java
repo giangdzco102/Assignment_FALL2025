@@ -22,21 +22,18 @@ public class RequestForLeaveController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra quyền truy cập
         List<String> features = (List<String>) session.getAttribute("featureURLs");
         if (features == null || !features.contains("/feature/requestforleave")) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this page.");
             return;
         }
 
-        // Nếu là lần đầu mở trang (chưa có form)
         if (req.getParameter("from") == null) {
             req.getRequestDispatcher("/feature/requestforleave.jsp").forward(req, resp);
             return;
         }
 
         try {
-            // Parse dữ liệu form
             String fromStr = req.getParameter("from");
             String toStr = req.getParameter("to");
             String reason = req.getParameter("reason");
@@ -45,7 +42,6 @@ public class RequestForLeaveController extends HttpServlet {
             Date from = sdf.parse(fromStr);
             Date to = sdf.parse(toStr);
 
-            // Tạo đối tượng LeaveApplication
             LeaveApplication leave = new LeaveApplication();
             leave.setCreatedBy(employee);
             leave.setCreateTime(new Date());
@@ -57,11 +53,9 @@ public class RequestForLeaveController extends HttpServlet {
                 leave.setProcessedBy(employee.getManager());
             }
 
-            // Lưu vào DB
             LeaveApplicationDBContext db = new LeaveApplicationDBContext();
             db.insert(leave);
 
-            // Sau khi nộp thành công → chuyển hướng về danh sách đơn nghỉ
             resp.sendRedirect(req.getContextPath() + "/feature/listleave");
 
         } catch (Exception e) {

@@ -23,7 +23,6 @@ public class AgendaController extends HttpServlet {
             return;
         }
 
-        // Kiểm tra quyền truy cập
         List<String> features = (List<String>) session.getAttribute("featureURLs");
         if (features == null || !features.contains("/feature/agenda")) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập.");
@@ -37,16 +36,17 @@ public class AgendaController extends HttpServlet {
         boolean isManager = account.getRoles().stream()
                 .anyMatch(r -> r.getName().equalsIgnoreCase("manager"));
 
+        boolean isDivisionHead = account.getRoles().stream()
+                .anyMatch(r -> r.getName().equalsIgnoreCase("divisionhead"));
+
         List<LeaveApplication> leaves;
-        if (isManager) {
-            // Lấy tất cả đơn APPROVED của nhân viên thuộc quản lý
+        if (isDivisionHead) {
+            leaves = db.getLeavesForDivisionHead(); 
             leaves = db.getLeavesApproveForManager(account.getId());
         } else {
-            // Lấy tất cả đơn APPROVED của chính nhân viên
             leaves = db.getLeavesByEmployee(account.getId());
         }
 
-        // --- Tạo map ngày -> tên nhân viên nghỉ để JSP hover ---
         Map<String, List<String>> leaveMap = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -69,19 +69,18 @@ public class AgendaController extends HttpServlet {
             end.set(Calendar.SECOND, 0);
             end.set(Calendar.MILLISECOND, 0);
 
-            // lặp từ start đến end
             while (!start.after(end)) {
                 String dayKey = sdf.format(start.getTime());
-                if (isManager && la.getCreatedBy() != null) {
+                if ( la.getCreatedBy() != null) {
                     leaveMap.computeIfAbsent(dayKey, k -> new ArrayList<>()).add(la.getCreatedBy().getName());
                 }
-                start.add(Calendar.DAY_OF_MONTH, 1); // tăng 1 ngày
+                start.add(Calendar.DAY_OF_MONTH, 1); 
             }
         }
 
         req.setAttribute("leaves", leaves);
-        req.setAttribute("isManager", isManager); // để JSP xử lý hover
-        req.setAttribute("leaveMap", leaveMap);   // để JSP hiển thị tooltip
+        req.setAttribute("isManager", isManager);
+        req.setAttribute("leaveMap", leaveMap); 
         req.getRequestDispatcher("/feature/agenda.jsp").forward(req, resp);
     }
 

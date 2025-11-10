@@ -7,8 +7,8 @@ public class Employee extends BaseModel {
     private String name;
     private String username;
     private String password;
-    private Employee manager; // ID_manager
-    private Division division; // ID_division
+    private Employee manager;  
+    private Division division; 
     private ArrayList<Role> roles;
 
     public String getName() {

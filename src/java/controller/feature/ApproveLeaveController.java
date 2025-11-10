@@ -22,11 +22,9 @@ public class ApproveLeaveController extends HttpServlet {
         }
 
 
-        // Lấy danh sách tất cả đơn pending của nhân viên thuộc quản lý manager
         LeaveApplicationDBContext db = new LeaveApplicationDBContext();
         List<LeaveApplication> leaves = db.getLeavesForManager(manager.getId());
 
-        // Gắn vào request để JSP hiển thị
         req.setAttribute("leaves", leaves);
         req.getRequestDispatcher("/feature/review.jsp").forward(req, resp);
     }
@@ -44,13 +42,12 @@ public class ApproveLeaveController extends HttpServlet {
 
         try {
             long leaveId = Long.parseLong(req.getParameter("leaveId"));
-            String action = req.getParameter("action"); // "APPROVE" hoặc "REJECT"
+            String action = req.getParameter("action"); 
 
             LeaveApplicationDBContext db = new LeaveApplicationDBContext();
             LeaveApplication leave = db.getLeaveById(leaveId);
 
             if (leave != null) {
-                // Chỉ cho manager của nhân viên duyệt
                 if (leave.getCreatedBy().getManager() != null
                         && leave.getCreatedBy().getManager().getId() == manager.getId()) {
 
@@ -65,7 +62,6 @@ public class ApproveLeaveController extends HttpServlet {
                 }
             }
 
-            // Sau khi xử lý, chuyển hướng về lại trang review
             resp.sendRedirect(req.getContextPath() + "/feature/review");
 
         } catch (Exception e) {

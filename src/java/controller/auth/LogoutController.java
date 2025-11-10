@@ -13,13 +13,11 @@ public class LogoutController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Lấy session hiện tại, nếu tồn tại thì invalidate
         HttpSession session = req.getSession(false);
         if (session != null) {
             session.invalidate();
         }
 
-        // Chuyển về trang login sau khi logout
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 

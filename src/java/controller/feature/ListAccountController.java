@@ -43,11 +43,9 @@ public class ListAccountController extends HttpServlet {
             ex.printStackTrace();
         }
 
-        // Load lại danh sách nhân viên
         List<Employee> employees = empDB.listWithRoles();
         req.setAttribute("employees", employees);
 
-        // Forward lại trang listAccount.jsp, vẫn ở trang đó
         req.getRequestDispatcher("/feature/listAccount.jsp").forward(req, resp);
     }
 }

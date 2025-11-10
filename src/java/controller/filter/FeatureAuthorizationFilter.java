@@ -34,7 +34,7 @@ public class FeatureAuthorizationFilter implements Filter {
         String path = req.getServletPath();
 
         if (featureURLs != null && featureURLs.contains(path)) {
-            chain.doFilter(request, response); // có quyền
+            chain.doFilter(request, response);
         } else {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập!");
         }
